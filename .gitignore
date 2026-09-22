@@ -1,0 +1,5 @@
+.DS_Store
+*.o
+*.tar.gz
+termux-ai-suite/
+node_modules/

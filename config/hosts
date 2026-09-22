@@ -1,0 +1,16 @@
+127.0.0.1 localhost
+::1 ip6-localhost
+172.65.90.22 opencode.ai
+104.20.32.17 models.opencode.ai
+160.79.104.10 api.anthropic.com
+160.79.104.10 code.claude.com
+35.190.46.17 downloads.claude.ai
+142.251.127.95 oauth2.googleapis.com
+142.251.127.84 accounts.google.com
+172.217.115.4 play.googleapis.com
+172.217.116.4 cloudaicompanion.googleapis.com
+142.251.98.95 cloudresourcemanager.googleapis.com
+142.250.130.207 storage.googleapis.com
+172.217.119.4 serviceusage.googleapis.com
+142.250.130.95 www.googleapis.com
+142.250.130.95 googleapis.com
