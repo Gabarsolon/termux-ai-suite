@@ -4,14 +4,15 @@ Run **OpenCode**, **Claude Code**, and **Antigravity CLI** (`agy`) natively insi
 
 ## Why
 
-Desktop Linux agent CLIs compiled for glibc fail on Android out of the box due to four barriers:
+Desktop Linux agent CLIs compiled for glibc fail on Android out of the box due to five barriers:
 
 1. **Bionic vs glibc** — Android's libc lacks `ld-linux-aarch64.so.1` and glibc conventions.
 2. **SELinux (Android 14+)** — `untrusted_app` can't `execute_no_trans` binaries in app-data dirs; MLS category enforcement.
-3. **Go runtime DNS** — pure-Go resolver needs `/etc/resolv.conf`, which Android doesn't have.
-4. **Routing / PMTU** — no default route in `main` table; IPv6 dual-stack blackholes hang connections.
+3. **Android App Seccomp Filter ("invalid system call" / SIGSYS)** — Zygote traps modern Linux syscalls like `faccessat2` (#439 in Go runtime) and `clone3` (#435 in Bun/glibc).
+4. **Go runtime DNS** — pure-Go resolver needs `/etc/resolv.conf`, which Android doesn't have.
+5. **Routing / PMTU** — no default route in `main` table; IPv6 dual-stack blackholes hang connections.
 
-This suite ships the fixes: hardened C launchers that `SYS_execve` the glibc binary via the Termux glibc loader, plus SELinux policy, DNS/flags, systemless hosts, and zero-login credential migration.
+This suite ships the fixes: hardened C launchers that auto-detect Seccomp and auto-unconfine via privilege drop to standard Termux UID/GID, execute the glibc binary via Termux's glibc loader with `SYS_execve`, plus SELinux policies, DNS/flags, systemless hosts, and zero-login credential migration. Users never need to run `sudo`.
 
 ## Layout
 
