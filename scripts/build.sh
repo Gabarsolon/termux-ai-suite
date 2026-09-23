@@ -12,7 +12,7 @@ SRC_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 # Device-specific values, auto-derived
 TERMUX_UID="$(stat -c %u "$PREFIX/bin")"
 TERMUX_GID="$TERMUX_UID"
-MLS="$(ls -ldZ "$PREFIX/bin" | awk -F'u:object_r:app_data_file:' '{print $2}' | awk '{print $1}')"
+MLS="$(ls -ldZ "$PREFIX/bin" | sed -n 's/.*u:object_r:app_data_file:\([^ ]*\).*/\1/p')"
 
 echo "→ UID=$TERMUX_UID MLS=$MLS"
 
@@ -36,6 +36,18 @@ done
 # agy symlink → antigravity
 ln -sf "$PREFIX/bin/antigravity" "$PREFIX/bin/agy"
 chcon -h "u:object_r:app_data_file:$MLS" "$PREFIX/bin/agy"
+
+# Ensure engine binaries and configs have proper MLS & ownership
+if [ -d "$HOME_DIR/.local" ]; then
+  chown -R "$TERMUX_UID:$TERMUX_GID" "$HOME_DIR/.local"
+  chcon -R -h "u:object_r:app_data_file:$MLS" "$HOME_DIR/.local"
+fi
+for item in .claude .claude.json .gemini .config; do
+  if [ -e "$HOME_DIR/$item" ]; then
+    chown -R "$TERMUX_UID:$TERMUX_GID" "$HOME_DIR/$item"
+    chcon -R -h "u:object_r:app_data_file:$MLS" "$HOME_DIR/$item"
+  fi
+done
 
 echo "✓ Launchers built:"
 for b in opencode claude antigravity agy; do

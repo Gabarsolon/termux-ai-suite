@@ -35,9 +35,17 @@ cat > "$PREFIX/glibc/etc/gai.conf" <<EOF
 precedence ::ffff:0:0/96  100
 EOF
 
+# Ensure Termux unprivileged user can read resolv.conf and gai.conf
+TERMUX_UID="$(stat -c %u "$PREFIX/bin" 2>/dev/null || echo 10000)"
+MLS="$(ls -ldZ "$PREFIX/bin" 2>/dev/null | sed -n 's/.*u:object_r:app_data_file:\([^ ]*\).*/\1/p')"
+if [ -n "$MLS" ]; then
+    chown -R "$TERMUX_UID:$TERMUX_UID" "$PREFIX/etc/resolv.conf" "$PREFIX/glibc/etc" 2>/dev/null || true
+    chcon -R -h "u:object_r:app_data_file:$MLS" "$PREFIX/etc/resolv.conf" "$PREFIX/glibc/etc" 2>/dev/null || true
+fi
+
 echo "→ systemless hosts"
-if [ -f "/data/adb/hosts" ]; then
-    cat > /data/adb/hosts <<'EOF'
+mkdir -p /data/adb
+cat > /data/adb/hosts <<'EOF'
 127.0.0.1 localhost
 ::1 ip6-localhost
 172.65.90.22 opencode.ai
@@ -55,11 +63,10 @@ if [ -f "/data/adb/hosts" ]; then
 142.250.130.95 www.googleapis.com
 142.250.130.95 googleapis.com
 EOF
-    chmod 644 /data/adb/hosts
-    chown 0:0 /data/adb/hosts
-    chcon u:object_r:system_file:s0 /data/adb/hosts
-    mount --bind /data/adb/hosts /system/etc/hosts 2>/dev/null
-fi
+chmod 644 /data/adb/hosts
+chown 0:0 /data/adb/hosts
+chcon u:object_r:system_file:s0 /data/adb/hosts
+mount --bind /data/adb/hosts /system/etc/hosts 2>/dev/null || true
 
 echo "→ boot persistence script"
 mkdir -p /data/adb/service.d

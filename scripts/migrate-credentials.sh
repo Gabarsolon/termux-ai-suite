@@ -16,7 +16,7 @@ trap 'rm -rf "$TMP"' EXIT
 TBALL="$TMP/creds.tar.gz"
 
 TGT_UID="$(adb -s "$TGT" shell "su -c 'stat -c %u /data/data/com.termux/files/usr/bin'" | tr -d '\r')"
-TGT_MLS="$(adb -s "$TGT" shell "su -c 'ls -ldZ /data/data/com.termux/files/usr/bin'" | awk -F\"u:object_r:app_data_file:\" '{print $2}' | awk '{print $1}' | tr -d '\r')"
+TGT_MLS="$(adb -s "$TGT" shell "su -c 'ls -ldZ /data/data/com.termux/files/usr/bin'" | sed -n 's/.*u:object_r:app_data_file:\([^ ]*\).*/\1/p' | tr -d '\r')"
 TGT_HOME="/data/data/com.termux/files/home"
 TGT_STAGE="/data/local/tmp/creds.tar.gz"
 
@@ -35,6 +35,13 @@ echo "→ push to $TGT"
 adb -s "$TGT" push "$TBALL" "$TGT_STAGE"
 
 echo "→ extract + fix ownership/SELinux"
-adb -s "$TGT" shell "su -c 'tar -xzpf $TGT_STAGE -C $TGT_HOME; rm -f $TGT_STAGE; chown -R $TGT_UID:$TGT_UID \"$TGT_HOME/.claude\" \"$TGT_HOME/.claude.json\" \"$TGT_HOME/.gemini\" \"$TGT_HOME/.config/opencode\" \"$TGT_HOME/.local\" 2>/dev/null || true; chcon -R -h u:object_r:app_data_file:$TGT_MLS \"$TGT_HOME/.claude\" \"$TGT_HOME/.claude.json\" \"$TGT_HOME/.gemini\" \"$TGT_HOME/.config/opencode\" \"$TGT_HOME/.local\" 2>/dev/null || true'" | tail -5
+adb -s "$TGT" shell "su -c '
+    tar -xzpf $TGT_STAGE -C $TGT_HOME
+    rm -f $TGT_STAGE
+    chown -R $TGT_UID:$TGT_UID \"$TGT_HOME/.claude\" \"$TGT_HOME/.claude.json\" \"$TGT_HOME/.gemini\" \"$TGT_HOME/.config\" \"$TGT_HOME/.local\" 2>/dev/null || true
+    if [ -n \"$TGT_MLS\" ]; then
+        chcon -R -h \"u:object_r:app_data_file:$TGT_MLS\" \"$TGT_HOME/.claude\" \"$TGT_HOME/.claude.json\" \"$TGT_HOME/.gemini\" \"$TGT_HOME/.config\" \"$TGT_HOME/.local\" 2>/dev/null || true
+    fi
+'" | tail -5
 
 echo "✓ credentials migrated to $TGT"

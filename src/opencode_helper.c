@@ -100,6 +100,9 @@ int main(int argc, char** argv) {
 
     setenv("GODEBUG", "netdns=cgo", 1);
     setenv("SSL_CERT_FILE", "/data/data/com.termux/files/usr/etc/tls/cert.pem", 1);
+    setenv("SSL_CERT_DIR", "/data/data/com.termux/files/usr/glibc/etc/ssl/certs", 1);
+    setenv("NODE_EXTRA_CA_CERTS", "/data/data/com.termux/files/usr/etc/tls/cert.pem", 1);
+    setenv("NODE_OPTIONS", "--dns-result-order=ipv4first", 1);
     setenv("TMPDIR", "/data/data/com.termux/files/usr/tmp", 1);
     setenv("PREFIX", "/data/data/com.termux/files/usr", 1);
 

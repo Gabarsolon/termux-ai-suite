@@ -65,7 +65,7 @@ opencode run "what is 2+2?"
 
 ## Device notes
 
-- S10 (G975F, Android 14 / Magisk): UID 10171, MLS `s0:c171,c256,c512,c768`
-- S23 (S911B, Android 16 / KernelSU): UID 10602, MLS `s0:c90,c258,c512,c768`
+- S10+ (G975F, Android 14 / Magisk): UID 10171, MLS `s0:c171,c256,c512,c768`
+- S23 (S911B, Android 14 / KernelSU): UID 10602, MLS `s0:c90,c258,c512,c768`
 
 The launchers run as the normal Termux user (`u0_aXXX`); root is only needed for the SELinux/routing setup and won't make the tools require it at runtime.
