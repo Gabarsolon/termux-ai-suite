@@ -26,7 +26,7 @@ adb -s "$SERIAL" shell "su -c '
 
     if [ -x /data/data/com.termux/files/usr/bin/clang ]; then
         echo \"→ clang detected: building launchers on device...\"
-        bash \"\$TERMUX_HOME/termux-ai-suite/scripts/build.sh\"
+        /data/data/com.termux/files/usr/bin/bash \"\$TERMUX_HOME/termux-ai-suite/scripts/build.sh\"
     else
         echo \"→ clang not found in Termux. Install via: pkg install clang glibc\"
     fi

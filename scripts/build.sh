@@ -6,6 +6,7 @@
 set -euo pipefail
 
 PREFIX="/data/data/com.termux/files/usr"
+export PATH="$PREFIX/bin:$PATH"
 HOME_DIR="/data/data/com.termux/files/home"
 SRC_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
